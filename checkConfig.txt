@@ -1,0 +1,2 @@
+###this is used to config devices to check. write the device numbers that you want to check everyday below:(use "," between different devices)
+1,9,8,4,5,
