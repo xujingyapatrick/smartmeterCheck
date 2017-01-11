@@ -1,5 +1,6 @@
 import sendemail
 import MySQLdb
+from datetime import datetime;
 
 
 #check configure file
@@ -25,7 +26,7 @@ cursorTime=db.cursor()
 cursorTime.execute("select now();")
 #use checkTime to record now time
 checkTime=cursorTime.fetchall()
-
+print(checkTime)
 for smartmeter in smartmeterList:
 	SQL=subCommand1+smartmeter+subCommand2
 	try:
@@ -38,6 +39,7 @@ for smartmeter in smartmeterList:
 				#use convertTime to add 2 hours to the selected record timestamp
 				convertTime=r"select timestamp('"+str(rows[3])+r"','2:00:00');"
 				cursorTime.execute(convertTime)
+				print(cursorTime.fetchall())
 				if cursorTime.fetchall()<checkTime:
 					emailContent.append("!!! no incoming data for device "+str(smartmeter)+" for 2 hours!")
 				elif rows[2]==NULL:
@@ -47,9 +49,15 @@ for smartmeter in smartmeterList:
 	except:
 		emailContent.add("Error: unable to fetch data")
 #prepare for sending email
-emailText=""
+weekdays=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+
+emailText=weekdays[datetime.now().weekday()]+" report:\n"
 for txt in emailContent:
-	emailText=emailText+"\n"+txt
+	emailText=emailText+txt+'\n'
+
+f=open("weeklyReport.txt",'a')
+f.write(emailText)
+f.close()
 
 sendemail.send(emailText)
 
